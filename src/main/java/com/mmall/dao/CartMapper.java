@@ -1,7 +1,6 @@
 package com.mmall.dao;
 
 import com.mmall.pojo.Cart;
-import com.sun.org.glassfish.external.probe.provider.annotations.ProbeParam;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
