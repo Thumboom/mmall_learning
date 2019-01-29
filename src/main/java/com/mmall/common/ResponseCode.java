@@ -19,6 +19,6 @@ public enum ResponseCode {
     }
 
     public String getDesc(){
-        return this.getDesc();
+        return this.desc;
     }
 }
