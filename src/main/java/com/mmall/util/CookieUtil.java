@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class CookieUtil {
 
-    private static String COOKIE_DOMAIN = ".happymall.com";
+    private static String COOKIE_DOMAIN = ".happymmall.com";
     private static String COOKIE_NAME = "mmall_login_token";
 
     public static String readLoginToken(HttpServletRequest request){
@@ -31,7 +31,7 @@ public class CookieUtil {
         cookie.setDomain(COOKIE_DOMAIN);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
-        cookie.setMaxAge(60 * 60);
+        cookie.setMaxAge(60 * 60 * 24 * 365);
         log.info("write cookieName:{},cookieValue:{}",cookie.getName(), cookie.getValue());
         response.addCookie(cookie);
     }
