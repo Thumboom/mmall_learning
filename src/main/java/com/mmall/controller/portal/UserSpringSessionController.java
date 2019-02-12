@@ -35,6 +35,9 @@ public class UserSpringSessionController {
     @ResponseBody
     public ServerResponse<User> login(String username, String password, HttpSession session, HttpServletResponse rsp){
 
+//        int i = 0;
+//        int result = 100 / i;
+
         ServerResponse<User> response = iUserService.login(username, password);
 
         if(response.isSuccess()){

@@ -1,5 +1,6 @@
 package com.mmall.dao;
 
+import com.mmall.common.Const;
 import com.mmall.pojo.Order;
 import org.apache.ibatis.annotations.Param;
 
@@ -25,4 +26,8 @@ public interface OrderMapper {
     List<Order> selectByUserId(Integer userId);
 
     List<Order> selectAllOrder();
+
+    List<Order> selectOrderStatusByCreateTime(@Param("status") Integer status, @Param("date") String date);
+
+    void closeOrderByOrderId(Integer id);
 }
