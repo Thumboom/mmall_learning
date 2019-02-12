@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
+import javax.annotation.PreDestroy;
 import java.util.concurrent.TimeUnit;
 
 @Controller
@@ -23,6 +24,14 @@ public class CloseOrderTask {
 
     @Autowired
     private RedissonManager redissonManager;
+
+
+    @PreDestroy
+    public void delLock(){
+        RedisShardedPoolUtil.del(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
+
+    }
+
 //    @Scheduled(cron="0 */1 * * * ?")
     public void closeOrderTaskV1(){
         log.info("关闭订单定时任务启动");
@@ -44,7 +53,7 @@ public class CloseOrderTask {
         }
         log.info("关闭订单定时任务结束");
     }
-//    @Scheduled(cron="0 */1 * * * ?")
+    @Scheduled(cron="0 */1 * * * ?")
     public void closeOrderTaskV3(){
         log.info("关闭订单定时任务启动");
         long lockTimeout = Long.parseLong(PropertiesUtil.getProperty("lock.timeout", "5000"));
@@ -71,7 +80,7 @@ public class CloseOrderTask {
         log.info("关闭订单定时任务结束");
     }
 
-    @Scheduled(cron="0 */1 * * * ?")
+//    @Scheduled(cron="0 */1 * * * ?")
     private void closeOrderTaskV4(){
         RLock lock = redissonManager.getRedisson().getLock(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
         boolean getLock = false;
@@ -112,8 +121,8 @@ public class CloseOrderTask {
     private void closeOrder(String lockName){
         RedisShardedPoolUtil.expire(lockName, 50);
         log.info("获取{},ThreadName{}", Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK, Thread.currentThread().getName() );
-//        int hour = Integer.parseInt(PropertiesUtil.getProperty("close.order.task.time.hour","2"));
-//        iOrderService.closeOrder(hour);
+        int hour = Integer.parseInt(PropertiesUtil.getProperty("close.order.task.time.hour","2"));
+        iOrderService.closeOrder(hour);
         RedisShardedPoolUtil.del(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
         log.info("释放{},ThreadName:{}",Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK,Thread.currentThread().getName());
         log.info("===============================");
