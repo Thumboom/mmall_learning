@@ -68,6 +68,7 @@ public class CartServiceImpl implements ICartService {
     }
 
     public ServerResponse<CartVo> deleteProduct(Integer userId, String productIds){
+        //默认以","隔开产品id
         List<String> productList = Splitter.on(",").splitToList(productIds);
 
         if( CollectionUtils.isEmpty(productList)){

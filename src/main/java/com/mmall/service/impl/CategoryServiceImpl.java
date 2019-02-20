@@ -69,6 +69,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
 
     public ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId){
+        //使用HashSet防止重复添加相同的分类id
         Set<Category> categorySet = Sets.newHashSet();
         findChildCategory(categorySet, categoryId);
 
@@ -80,7 +81,7 @@ public class CategoryServiceImpl implements ICategoryService {
         }
         return ServerResponse.createBySuccess(categoryIdList);
     }
-
+    //根据当前分类id递归寻找子类的分类id
     private Set<Category> findChildCategory(Set<Category> categorySet, Integer categoryId){
         Category category = categoryMapper.selectByPrimaryKey(categoryId);
         if( category != null){

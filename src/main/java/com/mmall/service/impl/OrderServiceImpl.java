@@ -76,7 +76,7 @@ public class OrderServiceImpl implements IOrderService {
 
     public ServerResponse createOrder(Integer userId, Integer shippingId){
         /*
-        从购物车中获取数据，计算总价，生成订单，减少库存
+        从购物车中获取数据，计算总价，生成订单，为订单条目设置订单号，减少库存，清空购物车
          */
         List<Cart> cartList = cartMapper.selectCheckedCartByUserId(userId);
         ServerResponse serverResponse = this.getCartOrderItem(userId, cartList);
@@ -84,6 +84,7 @@ public class OrderServiceImpl implements IOrderService {
             return serverResponse;
         }
         List<OrderItem> orderItemList = (List<OrderItem>) serverResponse.getData();
+        //使用BigDecimal保证精度不丢失
         BigDecimal payment = this.getOrderTotalPrice(orderItemList);
 
         if(CollectionUtils.isEmpty(orderItemList)){
@@ -118,8 +119,8 @@ public class OrderServiceImpl implements IOrderService {
         orderVo.setPostage(order.getPostage());
         orderVo.setStatus(order.getStatus());
 
-        System.out.println("order.getStatus() = " + order.getStatus());
-        System.out.println("Const.OrderStatusEnum.codeOf(order.getStatus())" + Const.OrderStatusEnum.codeOf(order.getStatus()));
+//        System.out.println("order.getStatus() = " + order.getStatus());
+//        System.out.println("Const.OrderStatusEnum.codeOf(order.getStatus())" + Const.OrderStatusEnum.codeOf(order.getStatus()));
 
         orderVo.setStatusDesc(Const.OrderStatusEnum.codeOf(order.getStatus()).getValue());
 
@@ -573,14 +574,18 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public void closeOrder(int hour) {
         Date closeDateTime = DateUtils.addHours(new Date(), -hour);
+
+        //选出订单创建时间早于当前时间-hour的订单
         List<Order> orderList = orderMapper.selectOrderStatusByCreateTime(Const.OrderStatusEnum.NO_PAY.getCode(), DateTimeUtil.dateToStr(closeDateTime));
         for( Order order : orderList){
             List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(order.getOrderNo());
             for( OrderItem orderItem : orderItemList){
+                //where 条件用主键， 防止锁表。
                 Integer stock = productMapper.selectStockByProductId(orderItem.getProductId());
                 if( stock == null){
                     continue;
                 }
+                //更新产品库存
                 Product product = new Product();
                 product.setId(orderItem.getProductId());
                 product.setStock(stock + orderItem.getQuantity());

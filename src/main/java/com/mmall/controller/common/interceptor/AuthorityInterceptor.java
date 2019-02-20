@@ -26,10 +26,12 @@ public class AuthorityInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) throws Exception {
 
         log.info("prehandle");
+        //请求中Controller的方法名
         HandlerMethod handlerMethod = (HandlerMethod) handler;
 
         String methodName = handlerMethod.getMethod().getName();
         String className = handlerMethod.getBean().getClass().getSimpleName();
+
 
         StringBuffer requestParamBuffer = new StringBuffer();
         Map paramMap = httpServletRequest.getParameterMap();
@@ -65,13 +67,15 @@ public class AuthorityInterceptor implements HandlerInterceptor {
         }
 
         if( user == null || (user.getRole().intValue() != Const.Role.ROLE_ADMIN)){
-            httpServletResponse.reset();
+            httpServletResponse.reset();//这里要添加reset，否则报异常 getWriter() has already been called for this response.
+                                        //该异常是因为一个请求中只能输出一次，因为程序在别的地方使用过输出流，所以要reset，reset后重新设置响应头等信息
             httpServletResponse.setCharacterEncoding("UTF-8");
             httpServletResponse.setContentType("application/json;charset=UTF-8");
 
             PrintWriter out = httpServletResponse.getWriter();
 
             if( user == null){
+                //富文本传输的信息格式不同，需要特殊处理
                 if(StringUtils.equals(className, "ProductManageController") && StringUtils.equals(methodName, "richtextImgUpload")){
                     Map resultMap = Maps.newHashMap();
                     resultMap.put("success", false);

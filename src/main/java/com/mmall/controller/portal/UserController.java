@@ -37,6 +37,7 @@ public class UserController {
 
         ServerResponse<User> response = iUserService.login(username, password);
 
+        //登录成功则向用户浏览器写入cookie，并将登录信息存入到redis中
         if(response.isSuccess()){
             CookieUtil.writeLoginToken(rsp, session.getId());
             RedisShardedPoolUtil.setEx(session.getId(), JsonUtil.obj2String(response.getData()), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
@@ -101,6 +102,7 @@ public class UserController {
 
     }
 
+    //登录状态下修改密码
     @RequestMapping(value = "reset_password.do", method  = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> resetPassword(HttpServletRequest request, String passwordNew, String passwordOld){
@@ -131,7 +133,7 @@ public class UserController {
         }
         user.setId(currentUser.getId());
         user.setUsername(currentUser.getUsername());
-
+        //更新用户信息成功则在redis中更新
         ServerResponse<User> response =  iUserService.updateInformation(user);
         if( response.isSuccess()){
             response.getData().setUsername(user.getUsername()   );

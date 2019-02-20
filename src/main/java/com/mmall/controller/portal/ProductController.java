@@ -23,6 +23,7 @@ public class ProductController {
         return iProductService.getProductDetail(productId);
     }
 
+    //Restful 命名风格
     @RequestMapping("/{productId}")
     @ResponseBody
     public ServerResponse<ProductDetailVo> detailRESTful(@PathVariable Integer productId){

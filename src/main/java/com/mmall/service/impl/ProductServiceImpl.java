@@ -205,6 +205,7 @@ public class ProductServiceImpl implements IProductService {
         PageHelper.startPage(pageNum, pageSize);
         if( StringUtils.isNotBlank(orderBy)){
             if(Const.ProductListOrderBy.PRICE_ASC_DESC.contains(orderBy)){
+                //格式默认为第一个是升序或者降序关键字，后面用_隔开需要根据的属性
                 String[] orderByArray = orderBy.split("_");
                 PageHelper.orderBy(orderByArray[0] + " " + orderByArray[1]);
             }

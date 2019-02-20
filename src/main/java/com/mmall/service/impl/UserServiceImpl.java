@@ -27,8 +27,6 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("用户名不存在");
         }
 
-
-        //todo md5登录
         String md5Password = MD5Util.MD5EncodeUtf8(password);
         User user  = userMapper.selectLogin(username,md5Password);
 
@@ -36,6 +34,7 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("密码错误");
         }
 
+        //重置密码为空，防止泄露
         user.setPassword(StringUtils.EMPTY);
         return ServerResponse.createBySuccess("登录成功", user);
     }
@@ -108,12 +107,13 @@ public class UserServiceImpl implements IUserService {
         if( resultCount == 0) {
             return ServerResponse.createByErrorMessage("回答错误");
         }
+        //使用token，标记该客户为已正确回答相应问题
         String forgetToken = UUID.randomUUID().toString();
         RedisShardedPoolUtil.setEx(Const.TOKEN_PREFIX  + username, forgetToken, 60 * 60 * 12);
         return ServerResponse.createBySuccess(forgetToken);
 
     }
-
+    //未登录状态下的更改密码，需要传入token来检验用户是否已经正确回答相应问题
     public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken){
         if(StringUtils.isBlank(forgetToken)){
             return ServerResponse.createByErrorMessage("参数错误， token不能为空");
@@ -138,8 +138,9 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createByErrorMessage("修改密码失败");
     }
 
+    //登录状态下更改密码
     public ServerResponse<String> resetPassword(String passwordNew, String passwordOld, User user){
-
+        //校验用户名和密码，防止横向越权
         int resultCount = userMapper.checkPassword(MD5Util.MD5EncodeUtf8(passwordOld), user.getId());
         if( resultCount == 0 ) {
             return ServerResponse.createByErrorMessage("旧密码错误");

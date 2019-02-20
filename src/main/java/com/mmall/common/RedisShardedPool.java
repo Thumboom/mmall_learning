@@ -38,7 +38,7 @@ public class RedisShardedPool {
         List<JedisShardInfo> jedisShardInfoList = new ArrayList<JedisShardInfo>(2);
         jedisShardInfoList.add(info1);
         jedisShardInfoList.add(info2);
-
+        //使用hash一致性算法
         pool = new ShardedJedisPool(config, jedisShardInfoList, Hashing.MURMUR_HASH, Sharded.DEFAULT_KEY_TAG_PATTERN);
     }
 

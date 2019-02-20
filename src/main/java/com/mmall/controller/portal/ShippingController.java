@@ -37,6 +37,7 @@ public class ShippingController {
         if( user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
+        //每次都校验userid，防止横向越权
         return iShippingService.add(user.getId(), shipping);
     }
 
@@ -52,6 +53,7 @@ public class ShippingController {
         if( user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
+        //每次都校验userid，防止横向越权
         return iShippingService.del(user.getId(), shippingId);
     }
 
@@ -67,6 +69,7 @@ public class ShippingController {
         if( user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
+        //每次都校验userid，防止横向越权
         return iShippingService.update(user.getId(), shipping);
     }
 
